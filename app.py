@@ -7,27 +7,52 @@ app = Flask(__name__)
 
 TARGET_URL = "https://www.bigmumbaia.com/#/saasLottery/WinGo?gameCode=WinGo_1M&lottery=WinGo"
 
-async def scrape_wingo_data():
+async def scrape_wingo_history():
     async with async_playwright() as p:
-        # बिना स्क्रीन/हेडलेस मोड में ब्राउज़र खोलना
-        browser = await p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
+        # रेंडर सर्वर के लिए क्रोमियम सेटिंग्स
+        browser = await p.chromium.launch(
+            headless=True, 
+            args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+        )
         page = await browser.new_page()
         
         try:
-            print("Target URL पर जा रहे हैं...")
+            print("Big Mumbai पेज पर जा रहे हैं...")
             await page.goto(TARGET_URL, wait_until="networkidle", timeout=60000)
             
-            # वेबसाइट को पूरी तरह लोड होने के लिए 5 सेकंड का वेट
-            await asyncio.sleep(5)
+            # टेबल और डेटा लोड होने के लिए थोड़ा एक्स्ट्रा वेट
+            await page.wait_for_timeout(7000)
             
-            # यहाँ हम पेज का टाइटल चेक कर रहे हैं ताकि पता चले पेज खुला या नहीं
-            title = await page.title()
+            # स्क्रीनशॉट में दिखने वाली 'Game history' टेबल के रोज़ (Rows) को सेलेक्ट करना
+            # ये कसी诺 वेबसाइट्स आमतौर पर 'van-row' या टेबल टैग्स का इस्तेमाल करती हैं
+            rows_selector = ".game-list .van-row, table tbody tr, .history-list .item"
             
-            # TODO: अगले स्टेप में हम यहाँ Big Mumbai के सटीक HTML क्लास/आईडी एलिमेंट्स डालकर 
-            # लाइव टाइमर और पिछले कलर्स का डेटा निकालेंगे।
+            # अगर सेलेक्टर मिलने में टाइम लगे तो बैकअप चेकिंग
+            rows = await page.query_selector_all(rows_selector)
             
+            history_data = []
+            
+            if not rows:
+                # अगर डायरेक्ट क्लास नहीं मिली, तो हम पेज से टेक्स्ट निकालने की कोशिश करेंगे
+                page_text = await page.inner_text("body")
+                if "Period" in page_text or "Game history" in page_text:
+                    return {"status": "connected", "message": "वेबसाइट लोड हो गई है, डेटा पार्सिंग चालू है।"}
+                return {"status": "empty", "message": "पेज लोड हुआ पर हिस्ट्री टेबल नहीं दिखी। लॉगिन या कैप्चा की ज़रूरत हो सकती है।"}
+
+            # टॉप 5 रिकॉर्ड्स निकालना
+            for row in rows[:5]:
+                text = await row.inner_text()
+                # टेक्स्ट को साफ करके लिस्ट बनाना (Period, Number, Size, Color)
+                clean_text = [item.strip() for item in text.split("\n") if item.strip()]
+                if clean_text:
+                    history_data.append(clean_text)
+                    
             await browser.close()
-            return {"status": "success", "page_title": title, "message": "सफलतापूर्वक कनेक्ट हो गया!"}
+            return {
+                "status": "success",
+                "game": "WinGo 1M",
+                "latest_history": history_data
+            }
             
         except Exception as e:
             await browser.close()
@@ -35,15 +60,13 @@ async def scrape_wingo_data():
 
 @app.route('/')
 def home():
-    return "AI Predictor Backend Server is Running!"
+    return "<h1>AI Predictor Engine Operational</h1><p>Use <b>/fetch-data</b> to trigger scraper.</p>"
 
 @app.route('/fetch-data')
 def fetch_data():
-    # स्क्रैपिंग फंक्शन को रन करना
-    result = asyncio.run(scrape_wingo_data())
+    result = asyncio.run(scrape_wingo_history())
     return jsonify(result)
 
 if __name__ == '__main__':
-    # रेंडर के पोर्ट पर ऐप को रन करना
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
