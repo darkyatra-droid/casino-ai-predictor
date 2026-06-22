@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Mumbai AI Predictor</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 450px;
+            margin: 30px auto;
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+        h1 { color: #ffca28; font-size: 24px; margin-bottom: 5px; }
+        .subtitle { color: #aaa; font-size: 14px; margin-bottom: 25px; }
+        
+        .prediction-box {
+            background: #252525;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #666;
+        }
+        
+        #colorResult {
+            font-size: 32px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: #333;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(245, 124, 0, 0.4);
+            transition: 0.3s;
+            width: 100%;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(245, 124, 0, 0.6); }
+        
+        .tip-box {
+            font-size: 13px;
+            color: #ffb74d;
+            background: rgba(255,183,77,0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>BIG MUMBAI AI ENGINE</h1>
+        <div class="subtitle">WinGo 1-Min Live Prediction</div>
+        
+        <div class="prediction-box" id="mainBox">
+            <div style="font-size: 14px; color: #888;">NEXT SUGGESTED COLOR</div>
+            <div id="colorResult">WAITING...</div>
+            <div>Probability: <span id="probability" style="color: #ffca28; font-weight: bold;">--</span></div>
+        </div>
+        
+        <button class="btn" onclick="fetchPrediction()">GET LIVE PREDICTION</button>
+        
+        <div class="tip-box">
+            <b>AI Strategy Tip:</b> <span id="strategy">Click the button above to sync live algorithm data from server.</span>
+        </div>
+    </div>
+
+    <script>
+        // तुम्हारी रेंडर वाली बैकएंड लिंक यहाँ है
+        const API_URL = "https://wingo-ai-backend.onrender.com/fetch-data";
+
+        async function fetchPrediction() {
+            const colorResult = document.getElementById("colorResult");
+            const probability = document.getElementById("probability");
+            const strategy = document.getElementById("strategy");
+            const mainBox = document.getElementById("mainBox");
+            
+            colorResult.innerText = "ANALYZING...";
+            colorResult.style.color = "#ffffff";
+            
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if(data.status === "success" || data.status === "connected") {
+                    const pred = data.ai_prediction;
+                    
+                    // UI पर कलर सेट करना और चमकाना
+                    colorResult.innerText = pred.next_suggested_color;
+                    probability.innerText = pred.winning_probability;
+                    strategy.innerText = pred.strategy_tip;
+                    
+                    if(pred.next_suggested_color === "GREEN") {
+                        colorResult.style.color = "#4caf50";
+                        mainBox.style.borderLeft = "5px solid #4caf50";
+                    } else {
+                        colorResult.style.color = "#f44336";
+                        mainBox.style.borderLeft = "5px solid #f44336";
+                    }
+                } else {
+                    colorResult.innerText = "TRY AGAIN";
+                }
+            } catch (error) {
+                console.error(error);
+                colorResult.innerText = "SERVER ERROR";
+                strategy.innerText = "बैकएंड सर्वर लोड हो रहा है, कृपया 10 सेकंड बाद दोबारा बटन दबाएं।";
+            }
+        }
+        
+        // पेज खुलते ही पहली प्रेडिक्शन लोड हो जाएगी
+        window.onload = fetchPrediction;
+    </script>
+</body>
+</html>
+
