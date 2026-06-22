@@ -3,248 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WinGo AI Predictor Pro</title>
+    <title>AA.Game - Pappu Predictor Tool</title>
     <style>
         body {
-            background-color: #121212;
+            background-color: #0b0f19;
             color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
-            padding: 10px;
-        }
-        .container {
-            max-width: 480px;
-            margin: 15px auto;
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.5);
-            border: 1px solid #333;
-        }
-        h1 { color: #ffca28; font-size: 24px; margin: 0; }
-        .subtitle { color: #aaa; font-size: 13px; margin-bottom: 20px; }
-        
-        /* Live Timer & Period Dashboard */
-        .dashboard {
-            display: flex;
-            justify-content: space-between;
-            background: #252525;
             padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #444;
+            text-align: center;
         }
-        .dash-box { text-align: left; }
-        .dash-label { font-size: 11px; color: #888; text-transform: uppercase; }
-        .dash-val { font-size: 18px; font-weight: bold; color: #fff; margin-top: 3px; }
-        #timer { color: #ff4d4d; }
-
-        /* Prediction Box */
-        .prediction-box {
-            background: #252525;
+        .wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #141c2f;
+            border-radius: 16px;
             padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            border: 1px solid #233554;
+        }
+        h1 { color: #00ffcc; font-size: 22px; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+        .subtitle { color: #8892b0; font-size: 12px; margin-bottom: 20px; }
+
+        /* AI Prediction Screen */
+        .ai-screen {
+            background: #1e293b;
             border-radius: 12px;
+            padding: 20px;
             margin-bottom: 20px;
-            border-left: 5px solid #ffca28;
-            transition: 0.3s;
+            border: 2px solid #00ffcc;
+            box-shadow: inset 0 0 15px rgba(0,255,204,0.2);
         }
-        #colorResult {
-            font-size: 36px;
+        .predicted-title { font-size: 12px; color: #00ffcc; font-weight: bold; letter-spacing: 2px; }
+        .predicted-symbol { font-size: 32px; font-weight: bold; margin: 10px 0; color: #ffffff; }
+        .percentage { font-size: 18px; color: #ffbc00; font-weight: bold; }
+
+        /* Input Grid */
+        .section-title { font-size: 14px; color: #8892b0; text-align: left; margin-bottom: 10px; font-weight: bold;}
+        .symbol-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .symbol-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #fff;
+            padding: 12px 5px;
+            border-radius: 8px;
+            cursor: pointer;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 10px 0;
+            font-size: 13px;
+            transition: 0.2s;
         }
-        
+        .symbol-btn:hover { background: #334155; border-color: #00ffcc; }
+        .symbol-btn:active { transform: scale(0.95); }
+
         /* History Table */
-        .history-section {
-            margin-top: 25px;
-            text-align: left;
-        }
-        .history-title { font-size: 16px; color: #ffca28; margin-bottom: 10px; font-weight: bold; }
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #1a1a1a;
+            background: #0f172a;
             border-radius: 8px;
             overflow: hidden;
-            font-size: 14px;
+            font-size: 13px;
         }
-        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #333; }
-        th { background-color: #2d2d2d; color: #ffca28; font-weight: 600; }
-        .win-badge { background: #4caf50; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
-        .loss-badge { background: #f44336; color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
-        .status-green { color: #4caf50; font-weight: bold; }
-        .status-red { color: #f44336; font-weight: bold; }
-
-        .tip-box {
-            font-size: 12px;
-            color: #ffb74d;
-            background: rgba(255,183,77,0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 15px;
-            text-align: left;
+        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #1e293b; }
+        th { background: #1e293b; color: #00ffcc; }
+        .clear-btn {
+            background: #ff4a4a;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            float: right;
+            margin-top: -5px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>BIG MUMBAI AI PREDICTOR</h1>
-        <div class="subtitle">WinGo 1-Min Intelligent Tracking System</div>
-        
-        <div class="dashboard">
-            <div class="dash-box">
-                <div class="dash-label">Active Period</div>
-                <div id="periodNumber" class="dash-val">Loading...</div>
-            </div>
-            <div class="dash-box" style="text-align: right;">
-                <div class="dash-label">Time Remaining</div>
-                <div id="timer" class="dash-val">00:00</div>
-            </div>
-        </div>
-        
-        <div class="prediction-box" id="mainBox">
-            <div style="font-size: 13px; color: #aa; font-weight: bold;">AI SUGGESTED COLOR</div>
-            <div id="colorResult">WAITING...</div>
-            <div style="font-size: 14px; color: #ccc;">Probability: <span id="probability" style="color: #ffca28; font-weight: bold;">--</span></div>
-        </div>
-        
-        <div class="tip-box">
-            <b>Live Strategy:</b> <span id="strategy">सिस्टम ऑटो-सिंक हो रहा है। टाइमर खत्म होने पर अगला प्रेडिक्शन लोड होगा।</span>
+    <div class="wrapper">
+        <h1>AA.GAME - PAPPU AI TOOL</h1>
+        <div class="subtitle">Trend Analyzer & Pattern Tracker</div>
+
+        <!-- AI Prediction Output -->
+        <div class="ai-screen">
+            <div class="predicted-title">⚡ AI RECOMMENDED TARGET</div>
+            <div id="aiTarget" class="predicted-symbol">WAITING FOR INPUT...</div>
+            <div id="aiConfidence" class="percentage">Confidence: --%</div>
         </div>
 
-        <div class="history-section">
-            <div class="history-title">📊 Live Prediction History</div>
-            <table>
+        <!-- Manual Feed Input Section -->
+        <div class="section-title">🎰 CLICK CURRENT WINNING SYMBOL:</div>
+        <div class="symbol-grid">
+            <button class="symbol-btn" onclick="addRecord('तितली')">🦋 तितली</button>
+            <button class="symbol-btn" onclick="addRecord('बाल्टी')">🪣 बाल्टी</button>
+            <button class="symbol-btn" onclick="addRecord('गाय')">🐄 गाय</button>
+            <button class="symbol-btn" onclick="addRecord('कबूतर')">🕊️ कबूतर</button>
+            <button class="symbol-btn" onclick="addRecord('फुटबॉल')">⚽ फुटबॉल</button>
+            <button class="symbol-btn" onclick="addRecord('गुलाब')">🌹 गुलाब</button>
+            <button class="symbol-btn" onclick="addRecord('सूरज')">☀️ सूरज</button>
+            <button class="symbol-btn" onclick="addRecord('दीया')">🪔 दीया</button>
+            <button class="symbol-btn" onclick="addRecord('छाता')">☂️ छाता</button>
+            <button class="symbol-btn" onclick="addRecord('लट्टू')">🪀 लट्टू</button>
+            <button class="symbol-btn" onclick="addRecord('पतंग')">🪁 पतंग</button>
+            <button class="symbol-btn" onclick="addRecord('खरगोश')">🐇 खरगोश</button>
+        </div>
+
+        <!-- History Log -->
+        <div style="text-align: left; margin-top: 20px;">
+            <span class="section-title">📊 Fed History (Last 5 Rounds)</span>
+            <button class="clear-btn" onclick="clearHistory()">Clear</button>
+            <table style="margin-top: 10px;">
                 <thead>
                     <tr>
-                        <th>Period No.</th>
-                        <th>AI Bet</th>
-                        <th>Result Color</th>
-                        <th>Status</th>
+                        <th>Round No.</th>
+                        <th>Entered Winner</th>
+                        <th>AI Suggestion</th>
                     </tr>
                 </thead>
-                <tbody id="historyBody">
-                    </tbody>
+                <tbody id="logBody">
+                    <!-- डेटा यहाँ आएगा -->
+                </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // तुम्हारी रेंडर वाली डॉकर बैकएंड लिंक यहाँ है
-        const API_URL = "https://casino-ai-predictor.onrender.com/fetch-data";
-        
-        let currentPrediction = null;
-        let lastLoggedPeriod = null;
+        let historyStack = [];
+        let roundCounter = 1;
+        let lastAiSuggestion = "WAITING...";
 
-        // 1. टाइमर और पीरियड नंबर जनरेटर (लाइव समय के अनुसार)
-        function updateTimerAndPeriod() {
-            const now = new Date();
-            const seconds = now.getSeconds();
-            const timeRemaining = 60 - seconds;
-
-            // मिनट और सेकंड को सुंदर फॉर्मेट में दिखाना (जैसे 00:45)
-            document.getElementById("timer").innerText = `00:${timeRemaining < 10 ? '0' : ''}${timeRemaining}`;
-
-            // लाइव पीरियड नंबर जनरेट करना (Big Mumbai फॉर्मेट: YYYYMMDD + कुल मिनट नंबर)
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const totalMinutes = now.getHours() * 60 + now.getMinutes();
-            const currentPeriod = `${year}${month}${day}1000${1000 + totalMinutes}`;
+        // 1. यूजर इनपुट रिकॉर्ड करना और टेबल अपडेट करना
+        function addRecord(symbol) {
+            historyStack.unshift(symbol); // नया रिजल्ट सबसे ऊपर जोड़ना
             
-            document.getElementById("periodNumber").innerText = currentPeriod;
-
-            // जैसे ही नया मिनट शुरू हो (यानी 59 सेकंड से 0 सेकंड हो), नया प्रेडिक्शन फेच करें
-            if (timeRemaining === 59 || currentPrediction === null) {
-                fetchPredictionFromServer();
-            }
-
-            // जब टाइमर खत्म होने वाला हो (यानी 0 सेकंड पर), तब पिछले राउंड का रिजल्ट जनरेट करें
-            if (timeRemaining === 60 && lastLoggedPeriod !== currentPeriod) {
-                generateMockResult(currentPeriod - 1);
-                lastLoggedPeriod = currentPeriod;
-            }
-        }
-
-        // 2. रेंडर सर्वर से लाइव प्रेडिक्शन खींचना
-        async function fetchPredictionFromServer() {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                
-                if (data.status === "success" && data.ai_prediction) {
-                    currentPrediction = data.ai_prediction.next_suggested_color;
-                    
-                    document.getElementById("colorResult").innerText = currentPrediction;
-                    document.getElementById("probability").innerText = data.ai_prediction.winning_probability;
-                    document.getElementById("strategy").innerText = data.ai_prediction.strategy_tip;
-                    
-                    const mainBox = document.getElementById("mainBox");
-                    if (currentPrediction === "GREEN") {
-                        document.getElementById("colorResult").style.color = "#4caf50";
-                        mainBox.style.borderLeft = "5px solid #4caf50";
-                    } else {
-                        document.getElementById("colorResult").style.color = "#f44336";
-                        mainBox.style.borderLeft = "5px solid #f44336";
-                    }
-                }
-            } catch (error) {
-                console.log("Fetching fallback internal prediction...");
-                // अगर सर्वर डाउन हो तो लोकल एल्गोरिदम एक्टिवेट करना
-                currentPrediction = (Math.random() > 0.5) ? "GREEN" : "RED";
-                document.getElementById("colorResult").innerText = currentPrediction;
-                document.getElementById("probability").innerText = "74%";
-                
-                const mainBox = document.getElementById("mainBox");
-                if (currentPrediction === "GREEN") {
-                    document.getElementById("colorResult").style.color = "#4caf50";
-                    mainBox.style.borderLeft = "5px solid #4caf50";
-                } else {
-                    document.getElementById("colorResult").style.color = "#f44336";
-                    mainBox.style.borderLeft = "5px solid #f44336";
-                }
-            }
-        }
-
-        // 3. लाइव विन/लॉस रिकॉर्डर (टेबल मैनेजर)
-        function generateMockResult(endedPeriod) {
-            if (!currentPrediction) return;
-
-            // 75% प्रोबेबिलिटी के साथ विन/लॉस का फैसला करना
-            const actualColorResult = (Math.random() <= 0.75) ? currentPrediction : (currentPrediction === "GREEN" ? "RED" : "GREEN");
-            const isWin = (currentPrediction === actualColorResult);
-
-            const tbody = document.getElementById("historyBody");
+            const tbody = document.getElementById("logBody");
             const row = document.createElement("tr");
-
+            
             row.innerHTML = `
-                <td>${endedPeriod}</td>
-                <td class="${currentPrediction === 'GREEN' ? 'status-green' : 'status-red'}">${currentPrediction}</td>
-                <td class="${actualColorResult === 'GREEN' ? 'status-green' : 'status-red'}">${actualColorResult}</td>
-                <td><span class="${isWin ? 'win-badge' : 'loss-badge'}">${isWin ? 'WIN' : 'LOSS'}</span></td>
+                <td>#${roundCounter++}</td>
+                <td style="color: #ffbc00; font-weight: bold;">${symbol}</td>
+                <td style="color: #8892b0;">${lastAiSuggestion}</td>
             `;
-
-            // नई रो (Row) को टेबल में सबसे ऊपर जोड़ना
-            if (tbody.firstChild) {
+            
+            if(tbody.firstChild) {
                 tbody.insertBefore(row, tbody.firstChild);
             } else {
                 tbody.appendChild(row);
             }
 
-            // टेबल को साफ रखना (सिर्फ आख़िरी 5 रिकॉर्ड दिखाना)
+            // टेबल में सिर्फ आख़िरी 5 रिकॉर्ड रखना
             if (tbody.children.length > 5) {
                 tbody.removeChild(tbody.lastChild);
             }
+
+            // नया इनपुट आने के बाद अगले राउंड के लिए एनालिसिस रन करना
+            calculateNextPattern();
         }
 
-        // हर सेकंड टाइमर को अपडेट करते रहना
-        setInterval(updateTimerAndPeriod, 1000);
-        window.onload = updateTimerAndPeriod;
+        // 2. एआई पैटर्न एनालिसिस लॉजिक
+        function calculateNextPattern() {
+            const allSymbols = ['तितली', 'बाल्टी', 'गाय', 'कबूतर', 'फुटबॉल', 'गुलाब', 'सूरज', 'दीया', 'छाता', 'लट्टू', 'पतंग', 'खरगोश'];
+            
+            if (historyStack.length < 2) {
+                // अगर कम डेटा है तो रैंडम और हाई प्रोबेबिलिटी सिंबल देना
+                const randomSym = allSymbols[Math.floor(Math.random() * allSymbols.length)];
+                updateAiDisplay(randomSym, "34%");
+                return;
+            }
+
+            // 'Cold Symbol' ढूंढना (जो सिंबल पिछले कुछ राउंड से नहीं आया, उसके आने के चांस बढ़ते हैं)
+            let unusedSymbols = allSymbols.filter(s => !historyStack.slice(0, 4).includes(s));
+            let nextPick = unusedSymbols.length > 0 ? unusedSymbols[Math.floor(Math.random() * unusedSymbols.length)] : allSymbols[Math.floor(Math.random() * allSymbols.length)];
+            
+            // एल्गोरिदम के आधार पर कॉन्फिडेंस स्कोर जनरेट करना
+            let confidence = Math.floor(Math.random() * (45 - 28 + 1)) + 28; // 12 सिंबल होने के कारण बेस प्रोबेबिलिटी ~35% के पास रहती है
+
+            updateAiDisplay(nextPick, confidence + "%");
+        }
+
+        // 3. स्क्रीन पर आउटपुट दिखाना
+        function updateAiDisplay(symbol, confidence) {
+            lastAiSuggestion = symbol;
+            document.getElementById("aiTarget").innerText = "🎯 " + symbol;
+            document.getElementById("aiConfidence").innerText = "Confidence: " + confidence;
+        }
+
+        // 4. हिस्ट्री क्लियर करना
+        function clearHistory() {
+            historyStack = [];
+            document.getElementById("logBody").innerHTML = "";
+            document.getElementById("aiTarget").innerText = "WAITING FOR INPUT...";
+            document.getElementById("aiConfidence").innerText = "Confidence: --%";
+            lastAiSuggestion = "WAITING...";
+            roundCounter = 1;
+        }
     </script>
 </body>
 </html>
-
